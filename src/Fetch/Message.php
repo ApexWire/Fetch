@@ -573,38 +573,6 @@ class Message
                 $messageBody = self::charsetConvert($messageBody, $parameters['charset'], self::$charset)
                     ?: $messageBody;
             }
-//            if (!empty($parameters['charset']) && $parameters['charset'] !== self::$charset) {
-//                $mb_converted = false;
-//                if (function_exists('mb_convert_encoding')) {
-//                    $encodings = mb_list_encodings();
-//                    if (!in_array($parameters['charset'], $encodings)) {
-//                        if ('cp1251' === $parameters['charset']) {
-//                            $parameters['charset'] = 'windows-1251';
-//                        }
-//                        $encodingIndex = array_search($parameters['charset'], array_map('mb_strtolower', $encodings));
-//                        if (false !== $encodingIndex) {
-//                            $parameters['charset'] = $encodings[$encodingIndex];
-//                        } else {
-//                            if ($structure->encoding === 0) {
-//                                $parameters['charset'] = 'US-ASCII';
-//                            } else {
-//                                $parameters['charset'] = 'UTF-8';
-//                            }
-//                        }
-//                    }
-//
-//                    $messageBody = @mb_convert_encoding($messageBody, self::$charset, $parameters['charset']);
-//                    $mb_converted = true;
-//                }
-//                if (!$mb_converted) {
-//                    $messageBodyConv = @iconv($parameters['charset'], self::$charset . self::$charsetFlag,
-//                        $messageBody);
-//
-//                    if ($messageBodyConv !== false) {
-//                        $messageBody = $messageBodyConv;
-//                    }
-//                }
-//            }
 
             if (strtolower($structure->subtype) === 'plain' || ($structure->type == 1 && strtolower($structure->subtype) !== 'alternative')) {
                 if (isset($this->plaintextMessage)) {
@@ -894,18 +862,6 @@ class Message
 
         $converted = null;
         if (!$converted && function_exists('mb_convert_encoding') && @mb_check_encoding($text, $from)) {
-
-//            $encodings = mb_list_encodings();
-//            if (!in_array($from, $encodings)) {
-//                if ('cp1251' === $from) {
-//                    $parameters['charset'] = 'windows-1251';
-//                }
-//                $encodingIndex = array_search($from, array_map('mb_strtolower', $encodings));
-//                if (false !== $encodingIndex) {
-//                    $from = $encodings[$encodingIndex];
-//                }
-//            }
-
             $converted = @mb_convert_encoding($text, $to, $from);
         }
 
