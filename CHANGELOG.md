@@ -4,7 +4,7 @@ apexwire/fetch changelog
 ## Under development
 
 
-## v0.8.1 on 2016.04.15
+## v0.8.0 on 2016.04.15
 
 - The minimum version of php 5.4
 - Add rawBody in Message
