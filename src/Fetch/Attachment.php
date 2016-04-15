@@ -77,18 +77,19 @@ class Attachment
      * attachment is located at, and the identifier for that body part. As a general rule you should not be creating
      * instances of this yourself, but rather should get them from an ImapMessage class.
      *
-     * @param Message   $message
+     * @param Message $message
      * @param \stdClass $structure
-     * @param string    $partIdentifier
+     * @param string $partIdentifier
      */
     public function __construct(Message $message, $structure, $partIdentifier = null)
     {
-        $this->messageId  = $message->getUid();
+        $this->messageId = $message->getUid();
         $this->imapStream = $message->getImapBox()->getImapStream();
-        $this->structure  = $structure;
+        $this->structure = $structure;
 
-        if (isset($partIdentifier))
+        if (isset($partIdentifier)) {
             $this->partId = $partIdentifier;
+        }
 
         $parameters = Message::getParametersFromStructure($structure);
 
@@ -102,8 +103,9 @@ class Attachment
 
         $this->mimeType = Message::typeIdToString($structure->type);
 
-        if (isset($structure->subtype))
+        if (isset($structure->subtype)) {
             $this->mimeType .= '/' . strtolower($structure->subtype);
+        }
 
         $this->encoding = $structure->encoding;
     }
@@ -122,7 +124,7 @@ class Attachment
                 : imap_body($this->imapStream, $this->messageId, FT_UID);
 
             $messageBody = Message::decode($messageBody, $this->encoding);
-            $this->data  = $messageBody;
+            $this->data = $messageBody;
         }
 
         return $this->data;
@@ -178,8 +180,9 @@ class Attachment
     {
         $path = rtrim($path, '/') . '/';
 
-        if (is_dir($path))
+        if (is_dir($path)) {
             return $this->saveAs($path . $this->getFileName());
+        }
 
         return false;
     }
@@ -192,12 +195,12 @@ class Attachment
      */
     public function saveAs($path)
     {
-        $dirname = dirname($path);
+        $dirName = dirname($path);
         if (file_exists($path)) {
             if (!is_writable($path)) {
                 return false;
             }
-        } elseif (!is_dir($dirname) || !is_writable($dirname)) {
+        } elseif (!is_dir($dirName) || !is_writable($dirName)) {
             return false;
         }
 
@@ -211,7 +214,8 @@ class Attachment
                 break;
 
             case 4: //quoted-printable
-                $streamFilter = stream_filter_append($filePointer, 'convert.quoted-printable-decode', STREAM_FILTER_WRITE);
+                $streamFilter = stream_filter_append($filePointer, 'convert.quoted-printable-decode',
+                    STREAM_FILTER_WRITE);
                 break;
 
             default:
@@ -220,7 +224,7 @@ class Attachment
 
         // Fix an issue causing server to throw an error
         // See: https://github.com/tedious/Fetch/issues/74 for more details
-        $fetch  = imap_fetchbody($this->imapStream, $this->messageId, $this->partId ?: 1, FT_UID);
+        imap_fetchbody($this->imapStream, $this->messageId, $this->partId ?: 1, FT_UID);
         $result = imap_savebody($this->imapStream, $filePointer, $this->messageId, $this->partId ?: 1, FT_UID);
 
         if ($streamFilter) {
@@ -232,6 +236,9 @@ class Attachment
         return $result;
     }
 
+    /**
+     * @param $text
+     */
     protected function setFileName($text)
     {
         $this->filename = MIME::decode($text, Message::$charset);

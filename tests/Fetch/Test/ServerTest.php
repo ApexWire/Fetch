@@ -23,9 +23,9 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider flagsDataProvider
-     * @param string  $expected server string with %host% placeholder
-     * @param integer $port     to use (needed to test behavior on port 143 and 993 from constructor)
-     * @param array   $flags    to set/unset ($flag => $value)
+     * @param string $expected server string with %host% placeholder
+     * @param integer $port to use (needed to test behavior on port 143 and 993 from constructor)
+     * @param array $flags to set/unset ($flag => $value)
      */
     public function testFlags($expected, $port, $flags)
     {
@@ -51,28 +51,28 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 
     public function flagsDataProvider()
     {
-        return array(
-                array('{%host%:143/novalidate-cert}', 143, array()),
-                array('{%host%:143/validate-cert}', 143, array('validate-cert' => true)),
-                array('{%host%:143}', 143, array('novalidate-cert' => false)),
-                array('{%host%:993/ssl}', 993, array()),
-                array('{%host%:993}', 993, array('ssl' => false)),
-                array('{%host%:100/tls}', 100, array('tls' => true)),
-                array('{%host%:100/tls}', 100, array('tls' => true, 'tls' => true)),
-                array('{%host%:100/notls}', 100, array('tls' => true, 'notls' => true)),
-                array('{%host%:100}', 100, array('ssl' => true, 'ssl' => false)),
-                array('{%host%:100/user=foo}', 100, array('user' => 'foo')),
-                array('{%host%:100/user=foo}', 100, array('user' => 'foo', 'user' => 'foo')),
-                array('{%host%:100/user=bar}', 100, array('user' => 'foo', 'user' => 'bar')),
-                array('{%host%:100}', 100, array('user' => 'foo', 'user' => false)),
-        );
+        return [
+            ['{%host%:143/novalidate-cert}', 143, []],
+            ['{%host%:143/validate-cert}', 143, ['validate-cert' => true]],
+            ['{%host%:143}', 143, ['novalidate-cert' => false]],
+            ['{%host%:993/ssl}', 993, []],
+            ['{%host%:993}', 993, ['ssl' => false]],
+            ['{%host%:100/tls}', 100, ['tls' => true]],
+            ['{%host%:100/tls}', 100, ['tls' => true, 'tls' => true]],
+            ['{%host%:100/notls}', 100, ['tls' => true, 'notls' => true]],
+            ['{%host%:100}', 100, ['ssl' => true, 'ssl' => false]],
+            ['{%host%:100/user=foo}', 100, ['user' => 'foo']],
+            ['{%host%:100/user=foo}', 100, ['user' => 'foo', 'user' => 'foo']],
+            ['{%host%:100/user=bar}', 100, ['user' => 'foo', 'user' => 'bar']],
+            ['{%host%:100}', 100, ['user' => 'foo', 'user' => false]],
+        ];
     }
 
     /**
      * @dataProvider connectionDataProvider
-     * @param integer $port    to use (needed to test behavior on port 143 and 993 from constructor)
-     * @param array   $flags   to set/unset ($flag => $value)
-     * @param string  $message Assertion message
+     * @param integer $port to use (needed to test behavior on port 143 and 993 from constructor)
+     * @param array $flags to set/unset ($flag => $value)
+     * @param string $message Assertion message
      */
     public function testConnection($port, $flags, $message)
     {
@@ -89,10 +89,10 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 
     public function connectionDataProvider()
     {
-        return array(
-            array(143, array(), 'Connects with default settings.'),
-            array(993, array('novalidate-cert' => true), 'Connects over SSL (self signed).'),
-        );
+        return [
+            [143, [], 'Connects with default settings.'],
+            [993, ['novalidate-cert' => true], 'Connects over SSL (self signed).'],
+        ];
     }
 
     public function testNumMessages()
@@ -100,7 +100,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $server = static::getServer();
         $numMessages = $server->numMessages();
         $this->assertEquals(self::$num_messages_inbox, $numMessages);
-        $this->assertEquals(0, $server->numMessages( 'DOESNOTEXIST'.time() ) );
+        $this->assertEquals(0, $server->numMessages('DOESNOTEXIST' . time()));
     }
 
     public function testGetMessages()
@@ -171,8 +171,8 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $spec = sprintf('{%s:143/novalidate-cert}', TESTING_SERVER_HOST);
 
         $list = $server->listMailboxes('*');
-        $this->assertContains($spec.'Sent', $list, 'Has mailbox "Sent"');
-        $this->assertNotContains($spec.'Cheese', $list, 'Does not have mailbox "Cheese"');
+        $this->assertContains($spec . 'Sent', $list, 'Has mailbox "Sent"');
+        $this->assertNotContains($spec . 'Cheese', $list, 'Does not have mailbox "Cheese"');
     }
 
     public function testCreateMailbox()
@@ -217,7 +217,8 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 
         $message->delete();
 
-        $this->assertInstanceOf('\Fetch\Message', $server->getMessageByUid(12), 'Message still present after being deleted but before being expunged.');
+        $this->assertInstanceOf('\Fetch\Message', $server->getMessageByUid(12),
+            'Message still present after being deleted but before being expunged.');
 
         $server->expunge();
 

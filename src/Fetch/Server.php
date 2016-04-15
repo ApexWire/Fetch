@@ -32,7 +32,7 @@ class Server
      *
      * @var array
      */
-    public static $sslFlags = array('ssl', 'validate-cert', 'novalidate-cert', 'tls', 'notls');
+    public static $sslFlags = ['ssl', 'validate-cert', 'novalidate-cert', 'tls', 'notls'];
 
     /**
      * This is used to prevent the class from putting up conflicting tags. Both directions- key to value, value to key-
@@ -40,7 +40,7 @@ class Server
      *
      * @var array
      */
-    public static $exclusiveFlags = array('validate-cert' => 'novalidate-cert', 'tls' => 'notls');
+    public static $exclusiveFlags = ['validate-cert' => 'novalidate-cert', 'tls' => 'notls'];
 
     /**
      * This is the domain or server path the class is connecting to.
@@ -77,7 +77,7 @@ class Server
      * @link http://us.php.net/manual/en/function.imap-open.php
      * @var array
      */
-    protected $flags = array();
+    protected $flags = [];
 
     /**
      * This is the port used to connect to the server
@@ -98,7 +98,7 @@ class Server
      *
      * @var array
      */
-    protected $params = array();
+    protected $params = [];
 
     /**
      * This is the resource connection to the server. It is required by a number of imap based functions to specify how
@@ -119,8 +119,8 @@ class Server
     /**
      * This constructor takes the location and service thats trying to be connected to as its arguments.
      *
-     * @param string      $serverPath
-     * @param null|int    $port
+     * @param string $serverPath
+     * @param null|int $port
      * @param null|string $service
      */
     public function __construct($serverPath, $port = 143, $service = 'imap')
@@ -147,14 +147,14 @@ class Server
      *
      * @param string $username
      * @param string $password
-     * @param bool   $tryFasterAuth tries to auth faster by disabling GSSAPI & NTLM auth methods (set to false if you use either of these auth methods)
+     * @param bool $tryFasterAuth tries to auth faster by disabling GSSAPI & NTLM auth methods (set to false if you use either of these auth methods)
      */
-    public function setAuthentication($username, $password, $tryFasterAuth=true)
+    public function setAuthentication($username, $password, $tryFasterAuth = true)
     {
         $this->username = $username;
         $this->password = $password;
         if ($tryFasterAuth) {
-            $this->setParam('DISABLE_AUTHENTICATOR', array('GSSAPI','NTLM'));
+            $this->setParam('DISABLE_AUTHENTICATOR', ['GSSAPI', 'NTLM']);
         }
     }
 
@@ -188,13 +188,14 @@ class Server
      * deal, so the value attribute is not required. However, if the value parameter is passed false it will clear that
      * flag.
      *
-     * @param string           $flag
+     * @param string $flag
      * @param null|string|bool $value
      */
     public function setFlag($flag, $value = null)
     {
-        if (!self::$sslEnable && in_array($flag, self::$sslFlags))
+        if (!self::$sslEnable && in_array($flag, self::$sslFlags)) {
             return;
+        }
 
         if (isset(self::$exclusiveFlags[$flag])) {
             $kill = self::$exclusiveFlags[$flag];
@@ -202,8 +203,9 @@ class Server
             $kill = $index;
         }
 
-        if (isset($kill) && false !== $index = array_search($kill, $this->flags))
+        if (isset($kill) && false !== $index = array_search($kill, $this->flags)) {
             unset($this->flags[$index]);
+        }
 
         $index = array_search($flag, $this->flags);
         if (isset($value) && $value !== true) {
@@ -223,15 +225,16 @@ class Server
     }
 
     /**
-     * This funtion is used to set various options for connecting to the server.
+     * This function is used to set various options for connecting to the server.
      *
-     * @param  int        $bitmask
+     * @param  int $bitmask
      * @throws \Exception
      */
     public function setOptions($bitmask = 0)
     {
-        if (!is_numeric($bitmask))
+        if (!is_numeric($bitmask)) {
             throw new \RuntimeException('Function requires numeric argument.');
+        }
 
         $this->options = $bitmask;
     }
@@ -254,8 +257,9 @@ class Server
      */
     public function getImapStream()
     {
-        if (empty($this->imapStream))
+        if (empty($this->imapStream)) {
             $this->setImapStream();
+        }
 
         return $this->imapStream;
     }
@@ -270,8 +274,9 @@ class Server
     {
         $mailboxPath = $this->getServerSpecification();
 
-        if (isset($this->mailbox))
+        if (isset($this->mailbox)) {
             $mailboxPath .= $this->mailbox;
+        }
 
         return $mailboxPath;
     }
@@ -285,11 +290,13 @@ class Server
     {
         $mailboxPath = '{' . $this->serverPath;
 
-        if (isset($this->port))
+        if (isset($this->port)) {
             $mailboxPath .= ':' . $this->port;
+        }
 
-        if ($this->service != 'imap')
+        if ($this->service != 'imap') {
             $mailboxPath .= '/' . $this->service;
+        }
 
         foreach ($this->flags as $flag) {
             $mailboxPath .= '/' . $flag;
@@ -307,13 +314,16 @@ class Server
     protected function setImapStream()
     {
         if (!empty($this->imapStream)) {
-            if (!imap_reopen($this->imapStream, $this->getServerString(), $this->options, 1))
+            if (!imap_reopen($this->imapStream, $this->getServerString(), $this->options, 1)) {
                 throw new \RuntimeException(imap_last_error());
+            }
         } else {
-            $imapStream = @imap_open($this->getServerString(), $this->username, $this->password, $this->options, 1, $this->params);
+            $imapStream = @imap_open($this->getServerString(), $this->username, $this->password, $this->options, 1,
+                $this->params);
 
-            if ($imapStream === false)
+            if ($imapStream === false) {
                 throw new \RuntimeException(imap_last_error());
+            }
 
             $this->imapStream = $imapStream;
         }
@@ -325,10 +335,10 @@ class Server
      * @param  string $mailbox
      * @return int
      */
-    public function numMessages($mailbox='')
+    public function numMessages($mailbox = '')
     {
         $cnt = 0;
-        if ($mailbox==='') {
+        if ($mailbox === '') {
             $cnt = imap_num_msg($this->getImapStream());
         } elseif ($this->hasMailbox($mailbox) && $mailbox !== '') {
             $oldMailbox = $this->getMailBox();
@@ -337,7 +347,7 @@ class Server
             $this->setMailbox($oldMailbox);
         }
 
-        return ((int) $cnt);
+        return ((int)$cnt);
     }
 
     /**
@@ -347,24 +357,26 @@ class Server
      *
      * @link http://us.php.net/imap_search
      * @link http://www.faqs.org/rfcs/rfc2060
-     * @param  string   $criteria
+     * @param  string $criteria
      * @param  null|int $limit
      * @return array    An array of ImapMessage objects
      */
     public function search($criteria = 'ALL', $limit = null)
     {
         if ($results = imap_search($this->getImapStream(), $criteria, SE_UID)) {
-            if (isset($limit) && count($results) > $limit)
+            if (isset($limit) && count($results) > $limit) {
                 $results = array_slice($results, 0, $limit);
+            }
 
-            $messages = array();
+            $messages = [];
 
-            foreach ($results as $messageId)
+            foreach ($results as $messageId) {
                 $messages[] = new Message($messageId, $this);
+            }
 
             return $messages;
         } else {
-            return array();
+            return [];
         }
     }
 
@@ -382,23 +394,25 @@ class Server
     /**
      * Returns the emails in the current mailbox as an array of ImapMessage objects.
      *
-     * @param  null|int  $limit
+     * @param  null|int $limit
      * @return Message[]
      */
     public function getMessages($limit = null)
     {
         $numMessages = $this->numMessages();
 
-        if (isset($limit) && is_numeric($limit) && $limit < $numMessages)
+        if (isset($limit) && is_numeric($limit) && $limit < $numMessages) {
             $numMessages = $limit;
+        }
 
-        if ($numMessages < 1)
-            return array();
+        if ($numMessages < 1) {
+            return [];
+        }
 
-        $stream   = $this->getImapStream();
-        $messages = array();
+        $stream = $this->getImapStream();
+        $messages = [];
         for ($i = 1; $i <= $numMessages; $i++) {
-            $uid        = imap_uid($stream, $i);
+            $uid = imap_uid($stream, $i);
             $messages[] = new Message($uid, $this);
         }
 
@@ -410,28 +424,28 @@ class Server
      * ordered by some ordering
      *
      * @see    http://php.net/manual/en/function.imap-sort.php
-     * @param  int       $orderBy
-     * @param  bool      $reverse
-     * @param  int       $limit
+     * @param  int $orderBy
+     * @param  bool $reverse
+     * @param  int $limit
      * @return Message[]
      */
     public function getOrderedMessages($orderBy, $reverse, $limit)
     {
         $msgIds = imap_sort($this->getImapStream(), $orderBy, $reverse ? 1 : 0, SE_UID);
 
-        return array_map(array($this, 'getMessageByUid'), array_slice($msgIds, 0, $limit));
+        return array_map([$this, 'getMessageByUid'], array_slice($msgIds, 0, $limit));
     }
 
     /**
      * Returns the requested email or false if it is not found.
      *
-     * @param  int          $uid
+     * @param  int $uid
      * @return Message|bool
      */
     public function getMessageByUid($uid)
     {
         try {
-            $message = new \Fetch\Message($uid, $this);
+            $message = new Message($uid, $this);
 
             return $message;
         } catch (\Exception $e) {
@@ -458,16 +472,16 @@ class Server
      */
     public function hasMailBox($mailbox)
     {
-        return (boolean) $this->getMailBoxDetails($mailbox);
+        return (boolean)$this->getMailBoxDetails($mailbox);
     }
 
     /**
-    * Return information about the mailbox or mailboxes
-    *
-    * @param $mailbox
-    *
-    * @return array
-    */
+     * Return information about the mailbox or mailboxes
+     *
+     * @param $mailbox
+     *
+     * @return array
+     */
     public function getMailBoxDetails($mailbox)
     {
         return imap_getmailboxes(
@@ -508,8 +522,8 @@ class Server
      *
      * @return bool
      */
-     public function deleteMailBox($mailbox)
-     {
-         return imap_deletemailbox($this->getImapStream(), $this->getServerSpecification() . $mailbox);
-     }
+    public function deleteMailBox($mailbox)
+    {
+        return imap_deletemailbox($this->getImapStream(), $this->getServerSpecification() . $mailbox);
+    }
 }

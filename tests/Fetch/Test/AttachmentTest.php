@@ -23,9 +23,10 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
         $server = ServerTest::getServer();
         $message = new \Fetch\Message($MessageId, $server);
         $attachments = $message->getAttachments();
-        $returnAttachments = array();
-        foreach($attachments as $attachment)
+        $returnAttachments = [];
+        foreach ($attachments as $attachment) {
             $returnAttachments[$attachment->getFileName()] = $attachment;
+        }
 
         return $returnAttachments;
     }
@@ -102,11 +103,13 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
 
         $attachments = static::getAttachments('6');
         $attachment_RCA = $attachments['RCA_Indian_Head_test_pattern.JPG.zip'];
-        $this->assertFalse($attachment_RCA->saveToDirectory('/'), 'Returns false when attempting to save without filesystem permission.');
+        $this->assertFalse($attachment_RCA->saveToDirectory('/'),
+            'Returns false when attempting to save without filesystem permission.');
 
         $attachments = static::getAttachments('6');
         $attachment_RCA = $attachments['RCA_Indian_Head_test_pattern.JPG.zip'];
-        $this->assertFalse($attachment_RCA->saveToDirectory($filepath), 'Returns false when attempting to save over a file.');
+        $this->assertFalse($attachment_RCA->saveToDirectory($filepath),
+            'Returns false when attempting to save over a file.');
     }
 
     public static function tearDownAfterClass()

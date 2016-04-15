@@ -1,67 +1,50 @@
-# Fetch [![Build Status](https://travis-ci.org/tedious/Fetch.svg?branch=master)](https://travis-ci.org/tedious/Fetch)
+Fetch
+=====
 
-[![License](http://img.shields.io/packagist/l/tedivm/fetch.svg)](https://github.com/tedious/fetch/blob/master/LICENSE)
-[![Latest Stable Version](http://img.shields.io/github/release/tedious/fetch.svg)](https://packagist.org/packages/tedivm/fetch)
-[![Coverage Status](http://img.shields.io/coveralls/tedious/Fetch.svg)](https://coveralls.io/r/tedious/Fetch?branch=master)
-[![Total Downloads](http://img.shields.io/packagist/dt/tedivm/fetch.svg)](https://packagist.org/packages/tedivm/fetch)
+**Fetch это библиотека для чтения электронной почты и вложений, по протоколам POP и IMAP.**
 
-Fetch is a library for reading email and attachments, primarily using the POP 
-and IMAP protocols.
+## Установка
 
+Предпочтительный способ установки расширения через [composer](http://getcomposer.org/download/).
 
-## Installing
- > N.b. A note on Ubuntu 14.04 (probably other Debian-based / Apt managed systems), the install of php5-imap does not enable the extension for CLI (possibly others as well), which can cause composer to report fetch requires ext-imap
- ```
-sudo ln -s /etc/php5/mods-available/imap.ini /etc/php5/cli/conf.d/30-imap.ini
- ```
+Запустить
 
-### Composer
-
-Installing Fetch can be done through a variety of methods, although Composer is
-recommended.
-
-Until Fetch reaches a stable API with version 1.0 it is recommended that you
-review changes before even Minor updates, although bug fixes will always be
-backwards compatible.
-
-```
-"require": {
-  "tedivm/fetch": "0.6.*"
-}
+```sh
+php composer.phar require "apexwire/fetch" : "^0.7.2"
 ```
 
-### Pear
+или добавить
 
-Fetch is also available through Pear.
-
-```
-$ pear channel-discover pear.tedivm.com
-$ pear install tedivm/Fetch
+```json
+"apexwire/fetch": "^0.7.2"
 ```
 
-### Github
+в разделе "require" вашего composer.json
 
-Releases of Fetch are available on [Github](https://github.com/tedious/Fetch/releases).
+## Применение
 
+Это лишь простой код, чтобы показать, как получить доступ к сообщениям с помощью Fetch. Он использует Fetch
+собственный автозагрузка, но он может (и должен быть, если это применимо) заменяется генерируемому
+композитором.
 
-## Sample Usage
-
-This is just a simple code to show how to access messages by using Fetch. It uses Fetch
-own autoload, but it can (and should be, if applicable) replaced with the one generated
-by composer.
-
-
+```php
     $server = new \Fetch\Server('imap.example.com', 993);
     $server->setAuthentication('dummy', 'dummy');
-
 
     $messages = $server->getMessages();
     /** @var $message \Fetch\Message */
     foreach ($messages as $message) {
         echo "Subject: {$message->getSubject()}\nBody: {$message->getMessageBody()}\n";
     }
+```
 
+## Лицензия
 
-## License
+Этот проект был выпущен под лицензией [BSD-3-Clause](LICENSE).
+Подробнее [тут](http://choosealicense.com/licenses/bsd-3-clause).
 
-Fetch is licensed under the BSD License. See the LICENSE file for details.
+Copyright © 2016, ApexWire
+
+## Выражение признательности
+
+- Проект является форком [Fetch](https://github.com/tedious/Fetch).

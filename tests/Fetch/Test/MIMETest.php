@@ -22,19 +22,19 @@ class MIMETest extends \PHPUnit_Framework_TestCase
 {
     public function decodeData()
     {
-        return array(
-            array(null, null),
-            array('Just text', 'Just text'),
-            array('Keith Moore <moore@cs.utk.edu>', '=?US-ASCII?Q?Keith_Moore?= <moore@cs.utk.edu>'),
-            array('Keld Jørn Simonsen <keld@dkuug.dk>', '=?ISO-8859-1?Q?Keld_J=F8rn_Simonsen?= <keld@dkuug.dk>'),
-            array('André Pirard <PIRARD@vm1.ulg.ac.be>', '=?ISO-8859-1?Q?Andr=E9?= Pirard <PIRARD@vm1.ulg.ac.be>'),
-            array(
+        return [
+            [null, null],
+            ['Just text', 'Just text'],
+            ['Keith Moore <moore@cs.utk.edu>', '=?US-ASCII?Q?Keith_Moore?= <moore@cs.utk.edu>'],
+            ['Keld Jørn Simonsen <keld@dkuug.dk>', '=?ISO-8859-1?Q?Keld_J=F8rn_Simonsen?= <keld@dkuug.dk>'],
+            ['André Pirard <PIRARD@vm1.ulg.ac.be>', '=?ISO-8859-1?Q?Andr=E9?= Pirard <PIRARD@vm1.ulg.ac.be>'],
+            [
                 'If you can read this you understand the example.',
                 '=?ISO-8859-1?B?SWYgeW91IGNhbiByZWFkIHRoaXMgeW8=?='
                 . PHP_EOL .
                 '=?ISO-8859-2?B?dSB1bmRlcnN0YW5kIHRoZSBleGFtcGxlLg==?='
-            ),
-        );
+            ],
+        ];
     }
 
     /**

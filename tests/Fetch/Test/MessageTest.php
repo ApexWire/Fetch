@@ -10,6 +10,7 @@
  */
 
 namespace Fetch\Test;
+
 use Fetch\Message;
 
 /**
@@ -69,7 +70,8 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($plaintextTest, md5($messageNonHTML), 'Message returns as plaintext.');
 
         $messageHTML = $message->getMessageBody(true);
-        $this->assertEquals($convertedHtmlTest, md5($messageHTML), 'Message converts from plaintext to HTML when requested.');
+        $this->assertEquals($convertedHtmlTest, md5($messageHTML),
+            'Message converts from plaintext to HTML when requested.');
 
         $message = static::getMessage(4);
         $messageHTML = $message->getMessageBody(true);
@@ -164,16 +166,20 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     public function testGetAttachments()
     {
         $messageWithoutAttachments = static::getMessage('3');
-        $this->assertFalse($messageWithoutAttachments->getAttachments(), 'getAttachments returns false when no attachments present.');
+        $this->assertFalse($messageWithoutAttachments->getAttachments(),
+            'getAttachments returns false when no attachments present.');
 
         $messageWithAttachments = static::getMessage('6');
         $attachments = $messageWithAttachments->getAttachments();
         $this->assertCount(2, $attachments);
-        foreach($attachments as $attachment)
-            $this->assertInstanceOf('\Fetch\Attachment', $attachment, 'getAttachments returns Fetch\Attachment objects.');
+        foreach ($attachments as $attachment) {
+            $this->assertInstanceOf('\Fetch\Attachment', $attachment,
+                'getAttachments returns Fetch\Attachment objects.');
+        }
 
         $attachment = $messageWithAttachments->getAttachments('Test_card.png.zip');
-        $this->assertInstanceOf('\Fetch\Attachment', $attachment, 'getAttachment returns specified Fetch\Attachment object.');
+        $this->assertInstanceOf('\Fetch\Attachment', $attachment,
+            'getAttachment returns specified Fetch\Attachment object.');
     }
 
     public function testCheckFlag()
@@ -214,7 +220,8 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         // Count Test Folder
         $testFolderNumStart = $server->numMessages('Test Folder');
         $server->setMailbox('Test Folder');
-        $this->assertEquals($testFolderNumStart, $server->numMessages(), 'Server presents consistent information between numMessages when mailbox set and directly queried for number of messages');
+        $this->assertEquals($testFolderNumStart, $server->numMessages(),
+            'Server presents consistent information between numMessages when mailbox set and directly queried for number of messages');
 
         // Get message from Test Folder
         $message = current($server->getMessages(1));
@@ -223,7 +230,8 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         // Switch to Sent folder, count messages
         $sentFolderNumStart = $server->numMessages('Sent');
         $server->setMailbox('Sent');
-        $this->assertEquals($sentFolderNumStart, $server->numMessages(), 'Server presents consistent information between numMessages when mailbox set and directly queried for number of messages');
+        $this->assertEquals($sentFolderNumStart, $server->numMessages(),
+            'Server presents consistent information between numMessages when mailbox set and directly queried for number of messages');
 
         // Switch to "Flagged" folder in order to test that function properly returns to it
         $this->assertTrue($server->setMailBox('Flagged Email'));
@@ -248,7 +256,8 @@ Now's the time =
 for all folk to come=
  to the aid of their country.
 ENCODE;
-        $this->assertEquals($quotedPrintableDecoded, Message::decode($quotedPrintable, 'quoted-printable'), 'Decodes quoted printable');
+        $this->assertEquals($quotedPrintableDecoded, Message::decode($quotedPrintable, 'quoted-printable'),
+            'Decodes quoted printable');
         $this->assertEquals($quotedPrintableDecoded, Message::decode($quotedPrintable, 4), 'Decodes quoted printable');
 
         $testString = 'This is a test string';
@@ -262,7 +271,7 @@ ENCODE;
 
     public function testTypeIdToString()
     {
-        $types = array();
+        $types = [];
         $types[0] = 'text';
         $types[1] = 'multipart';
         $types[2] = 'message';
@@ -274,8 +283,9 @@ ENCODE;
         $types[8] = 'other';
         $types[32] = 'other';
 
-        foreach($types as $id => $type)
+        foreach ($types as $id => $type) {
             $this->assertEquals($type, Message::typeIdToString($id));
+        }
     }
 
     public function testGetParametersFromStructure()
@@ -283,4 +293,20 @@ ENCODE;
 
     }
 
+    public function testCharsetConvert()
+    {
+        $this->assertSame('Привет', Message::charsetConvert(
+            implode(array_map('chr', [0xF0, 0xD2, 0xC9, 0xD7, 0xC5, 0xD4])),
+            'koi8-r',
+            'utf-8'
+        ));
+
+        $this->assertSame('test', Message::charsetConvert('test', 'unk1', 'unk1'), 'Same charsets not try converting');
+        $this->assertSame('', Message::charsetConvert('', 'unk1', 'unk1'), 'Empty text not try converting');
+
+        $this->assertSame(null, Message::charsetConvert('test', 'unk1', 'utf-8'),
+            'Null when source charset is unknown');
+        $this->assertSame(null, Message::charsetConvert('test', 'utf-8', 'unk1'),
+            'Null when destination charset is unknown');
+    }
 }
