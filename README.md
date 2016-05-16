@@ -10,13 +10,13 @@ Fetch
 Запустить
 
 ```sh
-php composer.phar require "apexwire/fetch" : "^0.8.0"
+php composer.phar require "apexwire/fetch" : "^0.9.0"
 ```
 
 или добавить
 
 ```json
-"apexwire/fetch": "^0.8.0"
+"apexwire/fetch": "^0.9.0"
 ```
 
 в разделе "require" вашего composer.json
