@@ -43,6 +43,13 @@ class Message
     protected $imapStream;
 
     /**
+     * This as an string which contains raw the message.
+     *
+     * @var string
+     */
+    protected $rawEmail;
+
+    /**
      * This as an string which contains raw header information for the message.
      *
      * @var string
@@ -320,6 +327,62 @@ class Message
     }
 
     /**
+     * This function returns an object containing the raw message.
+     *
+     * @return string
+     */
+    public function getRawEmail()
+    {
+        if (!isset($this->rawEmail)) {
+
+            $this->rawEmail = $this->rawHeaders;
+
+            $parameters = self::getParametersFromStructure($this->getStructure());
+
+            $boundaryBegin = $boundaryEnd = '';
+            if (isset($parameters['boundary'])) {
+                $boundaryBegin = "\n--".$parameters['boundary']."\n";
+                $boundaryEnd = "\n--".$parameters['boundary']."--"."\n";
+            }
+
+            $rawBody = $this->getRawBody();
+
+            if (is_array($rawBody)) {
+                foreach($this->getRawBody() as $partIdentifier => $partBody)
+                {
+                    //ignore the multipart body
+                    if ( !(strripos($partIdentifier, '.') === false) ) {
+                        continue;
+                    }
+
+                    $partStructure = $partBody['structure'];
+                    $partParameters = self::getParametersFromStructure($partStructure);
+
+                    $this->rawEmail.= $boundaryBegin;
+                    $charset = isset($partParameters['charset']) ? "charset={$partParameters['charset']};" : "";
+                    $format = isset($partParameters['format']) ? "format={$partParameters['format']};" : "";
+                    $this->rawEmail.= "Content-Type: ".self::typeIdToString($partStructure->type)."/".strtolower($partStructure->subtype)."; $charset $format\n";
+
+                    if ($partStructure->type == 0) {
+                        $this->rawEmail.= "Content-Transfer-Encoding: ".self::encodingsIdToString($partStructure->encoding)."\n";
+                    }
+
+                    if (isset($partParameters['boundary'])) {
+                        $this->rawEmail.= " boundary=\"{$partParameters['boundary']}\"\n";
+                    }
+
+                    $this->rawEmail.= $partBody['body'];
+                }
+                $this->rawEmail.= $boundaryEnd;
+            }else{
+                $this->rawEmail.= $boundaryBegin.$rawBody.$boundaryEnd;
+            }
+        }
+
+        return $this->rawEmail;
+    }
+
+    /**
      * This function returns an object containing the raw headers of the message.
      *
      * @param  bool $forceReload
@@ -338,7 +401,7 @@ class Message
     /**
      * This function returns an object containing the raw headers of the message.
      *
-     * @return string
+     * @return array|string
      */
     public function getRawBody()
     {
@@ -355,7 +418,10 @@ class Message
     {
         if (isset($partIdentifier)) {
             $body = imap_fetchbody($this->imapStream, $this->uid, $partIdentifier, FT_UID | FT_PEEK);
-            $this->rawBody[] = $body;
+            $this->rawBody[$partIdentifier] = [
+                'structure' => imap_bodystruct($this->imapStream, imap_msgno($this->imapStream, $this->uid), $partIdentifier),
+                'body' => $body
+            ];
         } else {
             $this->rawBody = $body = imap_body($this->imapStream, $this->uid, FT_UID | FT_PEEK);
         }
@@ -666,6 +732,36 @@ class Message
 
             default:
             case 7:
+                return 'other';
+        }
+    }
+
+    /**
+     * This function returns the body encoding that an imap integer maps to.
+     *
+     * @param $id
+     * @return string
+     */
+    public static function encodingsIdToString($id)
+    {
+        switch ($id) {
+            case 0:
+                return '7bit';
+
+            case 1:
+                return '8bit';
+
+            case 2:
+                return 'Binary';
+
+            case 3:
+                return 'Base64';
+
+            case 4:
+                return 'Quoted-Printable';
+
+            default:
+            case 5:
                 return 'other';
         }
     }

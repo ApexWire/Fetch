@@ -3,6 +3,11 @@ apexwire/fetch changelog
 
 ## Under development
 
+## v0.9.0 on 2016.05.16
+
+- Add rawEmail in Message
+- Add function encodingsIdToString 
+- Now rawBody associative array
 
 ## v0.8.0 on 2016.04.15
 
