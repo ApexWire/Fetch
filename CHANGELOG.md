@@ -3,6 +3,11 @@ apexwire/fetch changelog
 
 ## Under development
 
+## v0.9.1 on 2016.05.24
+
+- fix bug: Undefined property: stdClass::$bytes. Attachment.php(102)
+- fix bug: Undefined property: stdClass::$subject. Message.php(256)
+
 ## v0.9.0 on 2016.05.16
 
 - Add rawEmail in Message
