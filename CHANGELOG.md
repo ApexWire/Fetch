@@ -1,7 +1,9 @@
 apexwire/fetch changelog
 ---------------------------
 
-## Under development
+## v0.10.0 on 2016.05.24
+
+- add function: closeConnection
 
 ## v0.9.1 on 2016.05.24
 

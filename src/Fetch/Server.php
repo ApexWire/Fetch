@@ -178,6 +178,9 @@ class Server
         return true;
     }
 
+    /**
+     * @return string
+     */
     public function getMailBox()
     {
         return $this->mailbox;
@@ -309,7 +312,6 @@ class Server
 
     /**
      * This function creates or reopens an imapStream when called.
-     *
      */
     protected function setImapStream()
     {
@@ -326,6 +328,18 @@ class Server
             }
 
             $this->imapStream = $imapStream;
+        }
+    }
+
+    /**
+     * This function close an imapStream when called.
+     */
+    public function closeConnection()
+    {
+        if (!empty($this->imapStream)) {
+            if (!imap_close($this->imapStream)) {
+                throw new \RuntimeException(imap_last_error());
+            }
         }
     }
 
