@@ -802,13 +802,8 @@ class Message
         $outputAddresses = [];
         if (is_array($addresses)) {
             foreach ($addresses as $address) {
-                if (property_exists($address, 'mailbox') && $address->mailbox != 'undisclosed-recipients') {
+                if (property_exists($address, 'mailbox') && $address->mailbox != 'undisclosed-recipients' && property_exists($address, 'host')) {
                     $currentAddress = [];
-
-                    if (!isset($address->host)) {
-                        throw new \InvalidArgumentException('Error address param \'host\'. Address: '.serialize($address));
-                    }
-
                     $currentAddress['address'] = $address->mailbox . '@' . $address->host;
                     if (isset($address->personal)) {
                         $currentAddress['name'] = MIME::decode($address->personal, self::$charset);

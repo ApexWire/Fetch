@@ -1,6 +1,10 @@
 apexwire/fetch changelog
 ---------------------------
 
+## v0.10.1 on 2016.07.25
+
+- fix bug: Undefined property: stdClass::$host. Message.php(807)
+
 ## v0.10.0 on 2016.05.24
 
 - add function: closeConnection
